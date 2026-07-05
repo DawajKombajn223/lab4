@@ -1,6 +1,6 @@
 import socket
 import struct
-from generated_protocol import Ack, ChatMessage
+from generated_protocol import ReceiverAck, SensorReading
 
 HOST = "127.0.0.1"
 PORT = 50000
@@ -29,12 +29,14 @@ def send_message(sock: socket.socket, payload: bytes) -> None:
 def handle_client(conn: socket.socket, address: tuple[str, int]) -> None:
     try:
         data = recv_message(conn)
-        message, _ = ChatMessage.deserialize_from(data)
-        print(f"Otrzymano wiadomość od {message.sender} do {message.recipient}:")
-        print(f"  timestamp: {message.timestamp}")
-        print(f"  body: {message.body}")
+        reading, _ = SensorReading.deserialize_from(data)
+        print(f"Otrzymano pomiar z sensora {reading.sensor_id}:")
+        print(f"  lokalizacja: {reading.location}")
+        print(f"  temperatura: {reading.temperature_c:.1f} C")
+        print(f"  wilgotność: {reading.humidity_pct:.1f}%")
+        print(f"  bateria: {reading.battery_pct}%")
 
-        ack = Ack(status=0, message="Wiadomość odebrana")
+        ack = ReceiverAck(receiver_id="RX-01", status_code=0, message="Pomiar odebrany")
         send_message(conn, ack.serialize())
     except Exception as exc:
         print(f"Błąd obsługi klienta {address}: {exc}")
@@ -47,7 +49,7 @@ def main() -> None:
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind((HOST, PORT))
         server.listen(1)
-        print(f"Serwer nasłuchuje na {HOST}:{PORT}")
+        print(f"Serwer odbiornika nasłuchuje na {HOST}:{PORT}")
 
         while True:
             conn, addr = server.accept()

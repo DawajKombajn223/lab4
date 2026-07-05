@@ -1,18 +1,21 @@
 {
   "structs": [
     {
-      "name": "ChatMessage",
+      "name": "SensorReading",
       "fields": [
-        { "name": "sender", "type": "string" },
-        { "name": "recipient", "type": "string" },
+        { "name": "sensor_id", "type": "string" },
+        { "name": "location", "type": "string" },
+        { "name": "temperature_c", "type": "float32" },
+        { "name": "humidity_pct", "type": "float32" },
         { "name": "timestamp", "type": "uint32" },
-        { "name": "body", "type": "string" }
+        { "name": "battery_pct", "type": "uint8" }
       ]
     },
     {
-      "name": "Ack",
+      "name": "ReceiverAck",
       "fields": [
-        { "name": "status", "type": "uint8" },
+        { "name": "receiver_id", "type": "string" },
+        { "name": "status_code", "type": "uint8" },
         { "name": "message", "type": "string" }
       ]
     }

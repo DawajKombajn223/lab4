@@ -16,5 +16,5 @@ def test_generator_creates_output_file():
     output_path = Path("generated_protocol.py")
     assert output_path.exists(), "generated_protocol.py should be created"
     content = output_path.read_text(encoding="utf-8")
-    assert "class ChatMessage" in content
-    assert "class Ack" in content
+    assert "class SensorReading" in content
+    assert "class ReceiverAck" in content

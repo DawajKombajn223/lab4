@@ -22,7 +22,7 @@ def _decode_string(data: bytes, offset: int) -> Tuple[str, int]:
 @dataclass
 class {{ struct.name }}:
 {% for field in struct.fields %}
-    {{ field.name }}: {{ "str" if field.type == "string" else "int" }}
+    {{ field.name }}: {{ "str" if field.type == "string" else "int" if field.type in ["uint8", "uint16", "uint32"] else "float" }}
 {% endfor %}
 
     def serialize(self) -> bytes:

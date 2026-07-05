@@ -1,6 +1,10 @@
-# Generator kodu do serializacji TCP/IP
+# Generator kodu do serializacji danych sensora
 
 Projekt pokazuje generator kodu opartego na Jinja2, który z pliku `interface.json` tworzy Pythonowy moduł `generated_protocol.py` z metodami `serialize()` i `deserialize_from()`.
+
+## Temat przykładu
+
+W tym wariancie czujnik wysyła pomiar do odbiornika przez TCP/IP. Przykład pokazuje, jak wygenerować kod do serializacji danych telemetrycznych takich jak temperatura, wilgotność i poziom baterii.
 
 ## Struktura
 
@@ -8,15 +12,15 @@ Projekt pokazuje generator kodu opartego na Jinja2, który z pliku `interface.js
 - `templates/protocol.py.j2` - szablon Jinja2
 - `generator.py` - generator kodu
 - `generated_protocol.py` - wygenerowana implementacja
-- `server.py` - prosty serwer TCP
-- `client.py` - prosty klient TCP
+- `server.py` - odbiornik TCP
+- `client.py` - czujnik TCP
 
 ## Jak używać
 
 1. Zainstaluj zależności:
 
 ```bash
-python -m pip install jinja2
+python -m pip install -r requirements.txt
 ```
 
 2. Wygeneruj kod:
@@ -25,13 +29,13 @@ python -m pip install jinja2
 python generator.py
 ```
 
-3. Uruchom serwer:
+3. Uruchom odbiornik:
 
 ```bash
 python server.py
 ```
 
-4. W innym terminalu uruchom klienta:
+4. W innym terminalu uruchom czujnik:
 
 ```bash
 python client.py
@@ -39,7 +43,7 @@ python client.py
 
 ## Jak działa
 
-- `ChatMessage` i `Ack` są serializowane do binarnego formatu:
+- `SensorReading` i `ReceiverAck` są serializowane do formatu binarnego:
   - string: długość `uint32` + dane UTF-8
-  - integer: mały pakiet `struct`
-- klient wysyła `ChatMessage`, serwer odsyła `Ack`
+  - liczby: pakiet `struct`
+- czujnik wysyła pomiar, a odbiornik odsyła potwierdzenie

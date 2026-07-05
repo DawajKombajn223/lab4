@@ -1,7 +1,7 @@
 import socket
 import struct
 import time
-from generated_protocol import Ack, ChatMessage
+from generated_protocol import ReceiverAck, SensorReading
 
 HOST = "127.0.0.1"
 PORT = 50000
@@ -28,20 +28,22 @@ def send_message(sock: socket.socket, payload: bytes) -> None:
 
 
 def main() -> None:
-    message = ChatMessage(
-        sender="Alice",
-        recipient="Server",
+    reading = SensorReading(
+        sensor_id="S-001",
+        location="Greenhouse-A",
+        temperature_c=23.7,
+        humidity_pct=61.2,
         timestamp=int(time.time()),
-        body="Wiadomość testowa z klienta."
+        battery_pct=82,
     )
 
     with socket.create_connection((HOST, PORT)) as client:
-        print(f"Wysyłam wiadomość do serwera {HOST}:{PORT}")
-        send_message(client, message.serialize())
+        print(f"Sensor {reading.sensor_id} wysyła dane do odbiornika {HOST}:{PORT}")
+        send_message(client, reading.serialize())
 
         data = recv_message(client)
-        ack, _ = Ack.deserialize_from(data)
-        print(f"Otrzymano potwierdzenie: status={ack.status}, message={ack.message}")
+        ack, _ = ReceiverAck.deserialize_from(data)
+        print(f"Odbiornik odpowiedział: [{ack.status_code}] {ack.message}")
 
 
 if __name__ == "__main__":
