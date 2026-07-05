@@ -13,11 +13,13 @@ Dane obejmują:
 - wilgotność
 - znacznik czasu
 - poziom baterii
+- historię pomiarów w postaci listy wartości
 
 ## Najnowsze funkcje
 
 - generator kodu z pliku `interface.json`
 - automatyczna generacja klas `SensorReading` i `ReceiverAck`
+- obsługa pól listowych, takich jak `history`
 - komunikacja przez TCP/IP między klientem a serwerem
 - prosty interfejs GUI w Tkinter w kolorach FC Barcelony
 - testy automatyczne dla generatora i GUI

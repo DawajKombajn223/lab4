@@ -92,6 +92,7 @@ def build_sample_reading() -> SensorReading:
         humidity_pct=61.2,
         timestamp=0,
         battery_pct=82,
+        history=[23.5, 23.6, 23.7, 23.8, 23.9]
     )
 
 

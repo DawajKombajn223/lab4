@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass
-from typing import Tuple
+from typing import List, Tuple
 
 
 def _encode_string(value: str) -> bytes:
@@ -18,11 +18,28 @@ def _decode_string(data: bytes, offset: int) -> Tuple[str, int]:
     value = data[offset:offset + length].decode("utf-8")
     return value, offset + length
 
+
+def _encode_float_list(values: List[float]) -> bytes:
+    payload = struct.pack("<I", len(values))
+    for value in values:
+        payload += struct.pack("<f", value)
+    return payload
+
+
+def _decode_float_list(data: bytes, offset: int) -> Tuple[List[float], int]:
+    count = struct.unpack_from("<I", data, offset)[0]
+    offset += 4
+    values = []
+    for _ in range(count):
+        values.append(struct.unpack_from("<f", data, offset)[0])
+        offset += struct.calcsize("<f")
+    return values, offset
+
 {% for struct in structs %}
 @dataclass
 class {{ struct.name }}:
 {% for field in struct.fields %}
-    {{ field.name }}: {{ "str" if field.type == "string" else "int" if field.type in ["uint8", "uint16", "uint32"] else "float" }}
+    {{ field.name }}: {{ "str" if field.type == "string" else "int" if field.type in ["uint8", "uint16", "uint32"] else "float" if field.type == "float32" else "List[float]" }}
 {% endfor %}
 
     def serialize(self) -> bytes:
@@ -30,6 +47,8 @@ class {{ struct.name }}:
 {% for field in struct.fields %}
 {% if field.type == "string" %}
         parts.append(_encode_string(self.{{ field.name }}))
+{% elif field.type == "list" %}
+        parts.append(_encode_float_list(self.{{ field.name }}))
 {% elif field.type in types and types[field.type].format != "string" %}
         parts.append(struct.pack("<{{ types[field.type].format }}", self.{{ field.name }}))
 {% else %}
@@ -43,6 +62,8 @@ class {{ struct.name }}:
 {% for field in struct.fields %}
 {% if field.type == "string" %}
         {{ field.name }}, offset = _decode_string(data, offset)
+{% elif field.type == "list" %}
+        {{ field.name }}, offset = _decode_float_list(data, offset)
 {% elif field.type in types and types[field.type].format != "string" %}
         {{ field.name }} = struct.unpack_from("<{{ types[field.type].format }}", data, offset)[0]
         offset += struct.calcsize("<{{ types[field.type].format }}")
