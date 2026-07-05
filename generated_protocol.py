@@ -22,7 +22,7 @@ def _decode_string(data: bytes, offset: int) -> Tuple[str, int]:
 class ChatMessage:
     sender: str
     recipient: str
-    timestamp: uint32
+    timestamp: int
     body: str
 
     def serialize(self) -> bytes:
@@ -49,7 +49,7 @@ class ChatMessage:
 
 @dataclass
 class Ack:
-    status: uint8
+    status: int
     message: str
 
     def serialize(self) -> bytes:
