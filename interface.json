@@ -1,0 +1,27 @@
+{
+  "structs": [
+    {
+      "name": "ChatMessage",
+      "fields": [
+        { "name": "sender", "type": "string" },
+        { "name": "recipient", "type": "string" },
+        { "name": "timestamp", "type": "uint32" },
+        { "name": "body", "type": "string" }
+      ]
+    },
+    {
+      "name": "Ack",
+      "fields": [
+        { "name": "status", "type": "uint8" },
+        { "name": "message", "type": "string" }
+      ]
+    }
+  ],
+  "types": {
+    "uint8": { "format": "B" },
+    "uint16": { "format": "H" },
+    "uint32": { "format": "I" },
+    "float32": { "format": "f" },
+    "string": { "format": "string" }
+  }
+}

@@ -1,0 +1,59 @@
+"""Generated protocol classes for binary serialization and deserialization."""
+
+from __future__ import annotations
+
+import struct
+from dataclasses import dataclass
+from typing import Tuple
+
+
+def _encode_string(value: str) -> bytes:
+    encoded = value.encode("utf-8")
+    return struct.pack("<I", len(encoded)) + encoded
+
+
+def _decode_string(data: bytes, offset: int) -> Tuple[str, int]:
+    length = struct.unpack_from("<I", data, offset)[0]
+    offset += 4
+    value = data[offset:offset + length].decode("utf-8")
+    return value, offset + length
+
+{% for struct in structs %}
+@dataclass
+class {{ struct.name }}:
+{% for field in struct.fields %}
+    {{ field.name }}: {{ "str" if field.type == "string" else "int" }}
+{% endfor %}
+
+    def serialize(self) -> bytes:
+        parts = []
+{% for field in struct.fields %}
+{% if field.type == "string" %}
+        parts.append(_encode_string(self.{{ field.name }}))
+{% elif field.type in types and types[field.type].format != "string" %}
+        parts.append(struct.pack("<{{ types[field.type].format }}", self.{{ field.name }}))
+{% else %}
+        parts.append(self.{{ field.name }}.serialize())
+{% endif %}
+{% endfor %}
+        return b"".join(parts)
+
+    @classmethod
+    def deserialize_from(cls, data: bytes, offset: int = 0) -> Tuple["{{ struct.name }}", int]:
+{% for field in struct.fields %}
+{% if field.type == "string" %}
+        {{ field.name }}, offset = _decode_string(data, offset)
+{% elif field.type in types and types[field.type].format != "string" %}
+        {{ field.name }} = struct.unpack_from("<{{ types[field.type].format }}", data, offset)[0]
+        offset += struct.calcsize("<{{ types[field.type].format }}")
+{% else %}
+        {{ field.name }}, offset = {{ field.type }}.deserialize_from(data, offset)
+{% endif %}
+{% endfor %}
+        return cls(
+{% for field in struct.fields %}
+            {{ field.name }}={{ field.name }}{{ "," if not loop.last else "" }}
+{% endfor %}
+        ), offset
+
+{% endfor %}
