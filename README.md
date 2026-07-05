@@ -1,49 +1,91 @@
 # Generator kodu do serializacji danych sensora
 
-Projekt pokazuje generator kodu opartego na Jinja2, który z pliku `interface.json` tworzy Pythonowy moduł `generated_protocol.py` z metodami `serialize()` i `deserialize_from()`.
+Projekt pokazuje, jak bez użycia AI można zbudować prosty generator kodu w Pythonie. Na podstawie pliku `interface.json` narzędzie generuje klasy serializujące i deserializujące dane do formatu binarnego za pomocą szablonów Jinja2.
 
 ## Temat przykładu
 
-W tym wariancie czujnik wysyła pomiar do odbiornika przez TCP/IP. Przykład pokazuje, jak wygenerować kod do serializacji danych telemetrycznych takich jak temperatura, wilgotność i poziom baterii.
+W aktualnej wersji projekt jest oparty na scenariuszu „czujnik → odbiornik”.
+Czujnik wysyła pomiar przez TCP/IP, a odbiornik odbiera go i wysyła potwierdzenie.
+Dane obejmują:
+- identyfikator czujnika
+- lokalizację
+- temperaturę
+- wilgotność
+- znacznik czasu
+- poziom baterii
 
-## Struktura
+## Najnowsze funkcje
 
-- `interface.json` - definicja struktur danych
-- `templates/protocol.py.j2` - szablon Jinja2
-- `generator.py` - generator kodu
-- `generated_protocol.py` - wygenerowana implementacja
-- `server.py` - odbiornik TCP
-- `client.py` - czujnik TCP
+- generator kodu z pliku `interface.json`
+- automatyczna generacja klas `SensorReading` i `ReceiverAck`
+- komunikacja przez TCP/IP między klientem a serwerem
+- prosty interfejs GUI w Tkinter w kolorach FC Barcelony
+- testy automatyczne dla generatora i GUI
 
-## Jak używać
+## Struktura projektu
+
+- `interface.json` – definicja struktur danych
+- `templates/protocol.py.j2` – szablon Jinja2
+- `generator.py` – generator kodu
+- `generated_protocol.py` – wygenerowana implementacja
+- `server.py` – odbiornik TCP
+- `client.py` – czujnik TCP
+- `gui_app.py` – interfejs graficzny
+- `test_generator.py` – test generatora
+- `test_gui_app.py` – test GUI
+- `requirements.txt` – zależności projektu
+
+## Jak uruchomić
 
 1. Zainstaluj zależności:
 
-```bash
+```powershell
 python -m pip install -r requirements.txt
 ```
 
 2. Wygeneruj kod:
 
-```bash
+```powershell
 python generator.py
 ```
 
-3. Uruchom odbiornik:
+3. Uruchom odbiornik w jednym terminalu:
 
-```bash
+```powershell
 python server.py
 ```
 
-4. W innym terminalu uruchom czujnik:
+4. Uruchom czujnik w drugim terminalu:
 
-```bash
+```powershell
 python client.py
 ```
 
-## Jak działa
+5. Opcjonalnie uruchom GUI:
 
-- `SensorReading` i `ReceiverAck` są serializowane do formatu binarnego:
-  - string: długość `uint32` + dane UTF-8
-  - liczby: pakiet `struct`
-- czujnik wysyła pomiar, a odbiornik odsyła potwierdzenie
+```powershell
+python gui_app.py
+```
+
+## Jak działa projekt
+
+- plik `interface.json` definiuje schemat danych
+- `generator.py` wczytuje go i renderuje szablon Jinja2
+- wynik jest zapisywany do `generated_protocol.py`
+- klasy wygenerowane z tego pliku potrafią:
+  - serializować obiekty do bajtów
+  - deserializować bajty z powrotem do obiektów
+- klient i serwer komunikują się przez TCP/IP i wymieniają dane telemetryczne
+
+## Testy
+
+Uruchom testy poleceniem:
+
+```powershell
+python -m pytest -q
+```
+
+Jeśli chcesz, można jeszcze rozbudować projekt o:
+- wiele czujników jednocześnie
+- alarm przy zbyt wysokiej temperaturze
+- zapis danych do pliku lub bazy
