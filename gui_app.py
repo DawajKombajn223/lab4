@@ -9,23 +9,62 @@ class SensorReceiverApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.root.title("Sensor to Receiver")
-        self.root.geometry("520x320")
+        self.root.geometry("560x360")
+        self.root.configure(bg="#0b1f4a")
 
         self.status_var = tk.StringVar(value="Oczekuje na pomiar...")
-        self.log_text = tk.StringVar(value="")
 
-        ttk.Label(root, text="Czujnik -> Odbiornik", font=("Segoe UI", 14, "bold")).pack(pady=(12, 8))
+        title = ttk.Label(
+            root,
+            text="FC Barcelona Sensor Live",
+            font=("Segoe UI", 16, "bold"),
+            foreground="#f4d35e",
+            background="#0b1f4a",
+        )
+        title.pack(pady=(14, 4))
 
-        ttk.Label(root, textvariable=self.status_var, foreground="navy").pack(pady=6)
+        subtitle = ttk.Label(
+            root,
+            text="Czujnik → Odbiornik",
+            font=("Segoe UI", 11, "bold"),
+            foreground="#a50044",
+            background="#0b1f4a",
+        )
+        subtitle.pack(pady=(0, 8))
 
-        ttk.Button(root, text="Wygeneruj pomiar", command=self.send_sample).pack(pady=8)
+        status_frame = ttk.Frame(root, padding=10)
+        status_frame.pack(fill="x", padx=16)
+        status_frame.configure(style="Barca.TFrame")
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.status_var,
+            font=("Segoe UI", 10, "bold"),
+            foreground="#0b1f4a",
+            background="#f4d35e",
+        ).pack(fill="x")
+
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Barca.TFrame", background="#f4d35e")
+        style.configure("Barca.TButton", foreground="#ffffff", background="#a50044")
+        style.map("Barca.TButton", background=[("active", "#d4004b")])
+        style.configure("Barca.TLabel", background="#0b1f4a")
+
+        ttk.Button(
+            root,
+            text="Wygeneruj pomiar",
+            style="Barca.TButton",
+            command=self.send_sample,
+        ).pack(pady=10)
 
         frame = ttk.Frame(root, padding=10)
-        frame.pack(fill="both", expand=True)
+        frame.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+        frame.configure(style="Barca.TFrame")
 
-        ttk.Label(frame, text="Log:").pack(anchor="w")
-        log_widget = tk.Text(frame, height=10, width=60)
-        log_widget.pack(fill="both", expand=True)
+        ttk.Label(frame, text="Log transmisji", foreground="#0b1f4a", background="#f4d35e", font=("Segoe UI", 10, "bold")).pack(anchor="w")
+        log_widget = tk.Text(frame, height=10, width=60, bg="#fef8d8", fg="#0b1f4a", insertbackground="#0b1f4a")
+        log_widget.pack(fill="both", expand=True, pady=(4, 0))
         log_widget.configure(state="disabled")
         self.log_widget = log_widget
 
